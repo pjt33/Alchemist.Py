@@ -11,10 +11,10 @@ loop1 + 0k -> loop2
 loop2 + t -> k + loop2
 loop2 + 0t -> loop3
 loop3 + 0i -> loop4
-loop3 + i -> loop4
+loop3 + i -> loop5
 loop4 + t -> i + loop4
 loop4 + 0t -> loop3
-loop4 + r -> t + loop3
-loop4 + 0r -> loop6
+loop5 + r -> t + loop3
+loop5 + 0r -> loop6
 loop6 + t -> i + r + loop6
 loop6 + 0t -> i + loop0
