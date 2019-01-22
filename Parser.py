@@ -17,7 +17,8 @@ def parse_crn(source_code):
 		return optional_parser
 
 	whitespace = regex(r'\s*')
-	whitespace_newlines = regex(r'\s*', re.MULTILINE)
+	# Incorporates comments
+	whitespace_newlines = regex(r'\s*(#[^\n]*\s*)*', re.MULTILINE)
 
 	lexeme = lambda p: p << whitespace
 
@@ -85,30 +86,34 @@ def parse_crn(source_code):
 		theatom = yield atom
 		r((theatom, count) if isinstance(theatom, str) else theatom)
 
-
-	def pairs_to_dict(pairs):
-		return dict((x, y) for x, y in pairs)
+	@generate
+	def lhs():
+		merged = dict()
+		atom_counts = yield sepBy(simpleatom_count, plus)
+		for atom, count in atom_counts:
+			merged[atom] = count + merged.get(atom, 0)
+		r(merged)
 
 	@generate
 	def rule():
-		inputs = yield sepBy(simpleatom_count, plus)
+		inputs = yield lhs
 		yield arrow
 		outputs = yield sepBy(atom_count, plus)
-		r((pairs_to_dict(inputs), pairs_to_dict(outputs)))
+		r((inputs, outputs))
 
 	@generate
 	def initial_value():
 		yield pling
-		theatom = yield simpleatom
-		yield colon
-		count = yield natural
-		r((theatom, count))
+		inputs = yield lhs
+		r(inputs)
 
 	@generate
 	def program():
 		yield(whitespace_newlines)
 		rules = yield(sepEndBy(rule, whitespace_newlines))
-		initial_values = yield many(initial_value)
-		r((rules, pairs_to_dict(initial_values)))
+		initial_values = yield optional(initial_value)
+		if initial_values == None:
+			initial_values = dict()
+		r((rules, initial_values))
 
 	return program.parse(source_code)

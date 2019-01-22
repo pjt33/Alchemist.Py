@@ -10,3 +10,11 @@ E.g. with input
 the expected output is
 
     27
+
+### SideEffects
+
+Tests that side-effects are applied left-to-right and output doesn't include implicit newlines. Expected output: `13`
+
+### Initialiser
+
+Tests that the parser handles inline initialisation of the state. Expected output: `3`
