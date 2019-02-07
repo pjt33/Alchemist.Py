@@ -72,7 +72,7 @@ def parse_crn(source_code):
 		value = yield simpleatom
 		r(('*Out', value))
 
-	atom = in_atom | (out_atom ^ out_string) | simpleatom
+	atom = in_atom ^ out_atom ^ out_string ^ simpleatom
 
 	@generate
 	def simpleatom_count():
